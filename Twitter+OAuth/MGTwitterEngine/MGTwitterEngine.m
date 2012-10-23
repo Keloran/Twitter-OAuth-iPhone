@@ -1020,12 +1020,24 @@
         return nil;
     }
     
-    NSString *path = [NSString stringWithFormat:@"statuses/update.%@", API_FORMAT];
+    NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+    NSArray *matches = [detector matchesInString:status options:0 range:NSMakeRange(0, status.length)];
+    NSInteger numberOfURLs = matches.count;
+
+    NSMutableString *statusWithoutURLs = [[NSMutableString alloc] initWithString:status];
+    for (NSTextCheckingResult *result in matches) {
+        [statusWithoutURLs deleteCharactersInRange:result.range];
+    }
+    
+    NSInteger adjustedCharacters = (numberOfURLs * 21) + statusWithoutURLs.length;
     
     NSString *trimmedText = status;
-    if ([trimmedText length] > MAX_MESSAGE_LENGTH) {
-        trimmedText = [trimmedText substringToIndex:MAX_MESSAGE_LENGTH];
+    if(adjustedCharacters > MAX_MESSAGE_LENGTH) {
+        NSInteger charactersOverLimit = adjustedCharacters - MAX_MESSAGE_LENGTH;
+        trimmedText = [status substringWithRange:NSMakeRange(0, status.length - charactersOverLimit)];
     }
+        
+    NSString *path = [NSString stringWithFormat:@"statuses/update.%@", API_FORMAT];
     
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
     [params setObject:trimmedText forKey:@"status"];
