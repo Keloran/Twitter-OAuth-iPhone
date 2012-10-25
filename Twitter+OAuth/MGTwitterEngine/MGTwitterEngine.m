@@ -1036,7 +1036,8 @@
         NSInteger charactersOverLimit = adjustedCharacters - MAX_MESSAGE_LENGTH;
         trimmedText = [status substringWithRange:NSMakeRange(0, status.length - charactersOverLimit)];
     }
-        
+    
+    
     NSString *path = [NSString stringWithFormat:@"statuses/update.%@", API_FORMAT];
     NSMutableDictionary *params = [NSMutableDictionary dictionaryWithCapacity:0];
     [params setObject:trimmedText forKey:@"status"];
