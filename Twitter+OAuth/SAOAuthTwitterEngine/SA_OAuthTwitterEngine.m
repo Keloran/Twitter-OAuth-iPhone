@@ -107,14 +107,26 @@
 
 	OAMutableURLRequest			*request = [[[OAMutableURLRequest alloc] initWithURL: self.authorizeURL consumer: nil token: _requestToken realm: nil signatureProvider: nil] autorelease];	
 
-	[request setParameters: [NSArray arrayWithObject: [[[OARequestParameter alloc] initWithName: @"oauth_token" value: _requestToken.key] autorelease]]];	
+	[request setParameters: [NSArray arrayWithObject:[[[OARequestParameter alloc] initWithName: @"oauth_token" value: _requestToken.key] autorelease]]];
+
 	return request;
 }
 
 
 //A request token is used to eventually generate an access token
 - (void) requestRequestToken {
-	[self requestURL: self.requestTokenURL token: nil onSuccess: @selector(setRequestToken:withData:) onFail: @selector(outhTicketFailed:data:)];
+	//[self requestURL: self.requestTokenURL token: nil onSuccess: @selector(setRequestToken:withData:) onFail: @selector(outhTicketFailed:data:)];
+    OAMutableURLRequest				*request = [[[OAMutableURLRequest alloc] initWithURL: self.requestTokenURL consumer: self.consumer token:nil realm:nil signatureProvider: nil] autorelease];
+	if (!request) return;
+	
+	//if (self.pin.length) token.pin = self.pin;
+    [request setHTTPMethod: @"POST"];
+    [request setValue:@"" forHTTPHeaderField:@"oauth_callback"];
+//    [request setHTTPBody:[@"oauth_callback:oob" dataUsingEncoding:NSUTF8StringEncoding]];
+
+    OADataFetcher				*fetcher = [[[OADataFetcher alloc] init] autorelease];
+    [fetcher fetchDataWithRequest: request delegate: self didFinishSelector: @selector(setRequestToken:withData:) didFailSelector:  @selector(outhTicketFailed:data:)];
+
 }
 
 //this is what we eventually want
@@ -151,7 +163,7 @@
 	if (self.pin.length) token.pin = self.pin;
     [request setHTTPMethod: @"POST"];
 	
-    OADataFetcher				*fetcher = [[[OADataFetcher alloc] init] autorelease];	
+    OADataFetcher				*fetcher = [[[OADataFetcher alloc] init] autorelease];
     [fetcher fetchDataWithRequest: request delegate: self didFinishSelector: success didFailSelector: fail];
 }
 
