@@ -225,9 +225,10 @@ static NSString* const kGGTwitterLoadingBackgroundImage = @"twitter_load.png";
         
         [_engine requestAccessToken];
 
-        if ([_delegate respondsToSelector: @selector(OAuthTwitterController:authenticatedWithUsername:)])
+        if ([_delegate respondsToSelector: @selector(OAuthTwitterController:authenticatedWithUsername:)]) {
             [_delegate OAuthTwitterController: self authenticatedWithUsername: _engine.username];
-        [self dismissModalViewControllerAnimated:YES];
+            [self dismissModalViewControllerAnimated:YES];
+        }
         
 		NSString					*authPin = [self locateAuthPinInWebView: webView];
 
